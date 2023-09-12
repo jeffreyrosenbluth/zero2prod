@@ -1,11 +1,10 @@
 use reqwest::Client;
 use sqlx::{query, Connection, Executor, PgConnection, PgPool};
-use std::{net::TcpListener, sync::Arc};
+use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod::{
     configuration::{get_configuration, DatabaseSettings},
     startup::run,
-    AppState,
 };
 
 pub struct TestApp {
@@ -23,11 +22,11 @@ async fn spawn_app() -> TestApp {
     let _ = tokio::spawn(server);
     TestApp {
         address: port,
-        db_pool: connection_pool.pg_pool.clone(),
+        db_pool: connection_pool,
     }
 }
 
-pub async fn config_database(config: &DatabaseSettings) -> Arc<AppState> {
+pub async fn config_database(config: &DatabaseSettings) -> PgPool {
     let mut connection = PgConnection::connect(&config.connection_string_without_db())
         .await
         .expect("Failed to connect to Postgres.");
@@ -42,7 +41,7 @@ pub async fn config_database(config: &DatabaseSettings) -> Arc<AppState> {
         .run(&connection_pool)
         .await
         .expect("Failed to migrate database.");
-    Arc::new(AppState::new(connection_pool))
+    connection_pool
 }
 
 #[tokio::test]
