@@ -14,7 +14,6 @@ use std::sync::Arc;
 
 pub fn run(
     listener: TcpListener,
-    // state: Arc<AppState>,
     db_pool: PgPool,
 ) -> Result<Server<AddrIncoming, IntoMakeService<Router>>, Error> {
     let state = Arc::new(AppState::new(db_pool));
