@@ -31,12 +31,9 @@ impl DatabaseSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, ConfigError> {
-    // Initialize our configuration reader
     let settings = Config::builder()
         .add_source(File::new("configuration.yaml", FileFormat::Yaml))
         .build()?;
 
-    // Add configuration values from a file named `configuration`
-    // with the `ini` file format
     settings.try_deserialize::<Settings>()
 }
