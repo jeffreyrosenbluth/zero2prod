@@ -1,6 +1,5 @@
-use axum::{body::Body, extract::State, http::Response, response::IntoResponse, Form};
+use axum::{extract::State, http, response::IntoResponse, Form};
 use chrono::Utc;
-use hyper::StatusCode;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -16,18 +15,14 @@ pub struct FormData {
     name = "Adding a new subscriber",
     skip(form, state),
     fields(
-        request_id = %Uuid::new_v4(),
         subscriber_email = %form.email,
         subscriber_name = %form.name
     )
 )]
 pub async fn subscribe(state: State<Arc<AppState>>, form: Form<FormData>) -> impl IntoResponse {
     match insert_subscriber(state, form).await {
-        Ok(_) => Response::builder().status(200).body(Body::empty()).unwrap(),
-        Err(_) => Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body(Body::empty())
-            .unwrap(),
+        Ok(_) => http::StatusCode::OK,
+        Err(_) => http::StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
 
