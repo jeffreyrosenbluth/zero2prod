@@ -1,6 +1,8 @@
 pub mod configuration;
 pub mod routes;
 pub mod startup;
+pub mod telemetry;
+
 use axum_macros::FromRef;
 use sqlx::PgPool;
 
